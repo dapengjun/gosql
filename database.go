@@ -94,47 +94,7 @@ func (database *DataBase) QueryOne(sql string, args ...interface{}) map[string]s
 	if !database.connect() {
 		return nil
 	}
-	result := map[string]string{}
-	stmt, err := database.db.Prepare(sql)
-	if err != nil {
-		log.Errorln(err)
-		return nil
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(args...)
-	defer rows.Close()
-	if err != nil {
-		log.Errorln(err)
-		return nil
-	}
-	for rows.Next() {
-		columns, err := rows.Columns()
-		if err != nil {
-			log.Errorln(err)
-			return nil
-		}
-		for _, v := range columns {
-			var value string
-			rows.Scan(value)
-			result[v] = value
-		}
-		break
-	}
-
-	err = rows.Err()
-	if err != nil {
-		log.Errorln(err)
-		return nil
-	}
-	return result
-}
-
-func (database *DataBase) Query(sql string, args ...interface{}) []map[string]interface{} {
-	if !database.connect() {
-		return nil
-	}
-	result := make([]map[string]interface{}, 0)
+	result := make(map[string]string, 0)
 	stmt, err := database.db.Prepare(sql)
 	if err != nil {
 		log.Errorln(err)
@@ -156,17 +116,63 @@ func (database *DataBase) Query(sql string, args ...interface{}) []map[string]in
 	for rows.Next() {
 		values := make([]interface{}, len(columns))
 		for i, _ := range columns {
-			values[i] = &string{}
+			values[i] = new(string)
 		}
 		err := rows.Scan(values...)
 		if err != nil {
 			log.Errorln(err)
 			return nil
 		}
-		row := map[string]interface{}{}
 		for k, v := range columns {
-			row[v] = values[k]
-			log.Println(v, values[k])
+			result[v] = *(values[k].(*string))
+		}
+		break
+	}
+
+	err = rows.Err()
+	if err != nil {
+		log.Errorln(err)
+		return nil
+	}
+	return result
+}
+
+func (database *DataBase) Query(sql string, args ...interface{}) []map[string]string {
+	if !database.connect() {
+		return nil
+	}
+	result := make([]map[string]string, 0)
+	stmt, err := database.db.Prepare(sql)
+	if err != nil {
+		log.Errorln(err)
+		return nil
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(args...)
+	defer rows.Close()
+	if err != nil {
+		log.Errorln(err)
+		return nil
+	}
+	columns, err := rows.Columns()
+	if err != nil {
+		log.Errorln(err)
+		return nil
+	}
+	for rows.Next() {
+		values := make([]interface{}, len(columns))
+		for i, _ := range columns {
+			values[i] = new(string)
+		}
+		err := rows.Scan(values...)
+		if err != nil {
+			log.Errorln(err)
+			return nil
+		}
+		row := map[string]string{}
+		for k, v := range columns {
+			row[v] = *(values[k].(*string))
 		}
 		result = append(result, row)
 	}

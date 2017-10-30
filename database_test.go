@@ -7,7 +7,7 @@ import (
 
 func Test_data(t *testing.T) {
 	db := GetInstance()
-	db.Init("mysql", "fengshen", "", "", 3306, "voip_conf")
-	list := db.Query("select * from ac_conference")
-	fmt.Println(list)
+	db.Init("mysql", "root", "root", "127.0.0.1", 3306, "dbname")
+	list := db.Query("select * from tb")
+	fmt.Println(len(list), list)
 }
