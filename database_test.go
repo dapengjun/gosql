@@ -2,6 +2,7 @@ package gosql
 
 import (
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 	"testing"
 )
 

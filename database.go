@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	log "github.com/dapengjun/logrotating"
-	_ "github.com/go-sql-driver/mysql"
 	"sync"
 )
 
