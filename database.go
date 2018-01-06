@@ -114,8 +114,8 @@ func (database *DataBase) QueryOne(sql string, args ...interface{}) map[string]s
 	}
 	for rows.Next() {
 		values := make([]interface{}, len(columns))
-		for i, _ := range columns {
-			values[i] = new(string)
+		for i := range columns {
+			values[i] = new(*string)
 		}
 		err := rows.Scan(values...)
 		if err != nil {
@@ -123,7 +123,12 @@ func (database *DataBase) QueryOne(sql string, args ...interface{}) map[string]s
 			return nil
 		}
 		for k, v := range columns {
-			result[v] = *(values[k].(*string))
+			val := *(values[k].(**string))
+			if val == nil {
+				result[v] = ""
+			} else {
+				result[v] = *val
+			}
 		}
 		break
 	}
