@@ -166,8 +166,8 @@ func (database *DataBase) Query(sql string, args ...interface{}) []map[string]st
 	}
 	for rows.Next() {
 		values := make([]interface{}, len(columns))
-		for i, _ := range columns {
-			values[i] = new(string)
+		for i := range columns {
+			values[i] = new(*string)
 		}
 		err := rows.Scan(values...)
 		if err != nil {
@@ -176,7 +176,12 @@ func (database *DataBase) Query(sql string, args ...interface{}) []map[string]st
 		}
 		row := map[string]string{}
 		for k, v := range columns {
-			row[v] = *(values[k].(*string))
+			val := *(values[k].(**string))
+			if val == nil {
+				row[v] = ""
+			} else {
+				row[v] = *val
+			}
 		}
 		result = append(result, row)
 	}
