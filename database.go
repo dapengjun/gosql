@@ -3,7 +3,7 @@ package gosql
 import (
 	"database/sql"
 	"fmt"
-	log "github.com/dapengjun/logrotating"
+	log "github.com/fsjun/logrotating"
 	"sync"
 )
 
